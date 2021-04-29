@@ -52,6 +52,7 @@ int main()
 		printf("----------------------------------------------------------------\n");
 
 		printf("Command = ");
+		fflush(stdout);
 		scanf(" %c", &command);
 
 		switch(command) {
@@ -63,16 +64,19 @@ int main()
 			break;
 		case 'n': case 'N':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			insert(head, key);
 			break;
 		case 'd': case 'D':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			deleteLeafNode(head, key);
 			break;
 		case 'f': case 'F':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			ptr = searchIterative(head, key);
 			if(ptr != NULL)
@@ -82,6 +86,7 @@ int main()
 			break;
 		case 's': case 'S':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			ptr = searchRecursive(head->left, key);
 			if(ptr != NULL)
@@ -127,23 +132,56 @@ int initializeBST(Node** h) {
 
 void inorderTraversal(Node* ptr)
 {
-
+	if(ptr){
+		inorderTraversal(ptr->left);
+		printf("%d   ",ptr->key);
+		inorderTraversal(ptr->right);
+	}
 }
 
 void preorderTraversal(Node* ptr)
 {
-
+	if(ptr){
+		printf("%d   ",ptr->key);
+		preorderTraversal(ptr->left);
+		preorderTraversal(ptr->right);
+	}
 }
 
 void postorderTraversal(Node* ptr)
 {
-
+	if(ptr){
+		postorderTraversal(ptr->left);
+		postorderTraversal(ptr->right);
+		printf("%d   ",ptr->key);
+	}
 }
 
 
 int insert(Node* head, int key)
 {
-
+	Node* tmp=head->left;
+	Node* node=NULL;
+	Node* tmp_=NULL;
+	node=(Node*)malloc(sizeof(Node));
+	node->key=key;
+	node->left=node->right=NULL;
+	if(!tmp){
+		head->left=node;
+		return 0;
+	}
+	while(tmp){
+		tmp_=tmp;
+	if(key<=tmp->key)
+		tmp=tmp->left;
+	else
+		tmp=tmp->right;
+	}
+	if(key<=tmp_->key)
+		tmp_->left=node;
+	else
+		tmp_->right=node;
+	return 0;
 }
 
 int deleteLeafNode(Node* head, int key)
@@ -153,12 +191,27 @@ int deleteLeafNode(Node* head, int key)
 
 Node* searchRecursive(Node* ptr, int key)
 {
+	if(!ptr) return NULL;
+	if(ptr->key==key)
+		return ptr;
+	if(key<ptr->key)
+		return searchRecursive(ptr->left,key);
+	return searchRecursive(ptr->right,key);
 
 }
 
 Node* searchIterative(Node* head, int key)
 {
-
+	Node* tmp=head->left;
+	while (tmp) {
+	if (key == tmp->key)
+		return tmp;
+	else if (key < tmp->key)
+		tmp = tmp->left;
+	else
+		tmp = tmp->right;
+	}
+	return NULL;
 }
 
 
