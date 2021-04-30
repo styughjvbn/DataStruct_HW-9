@@ -11,10 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 typedef struct node {
 	int key;
-	struct node *left;
-	struct node *right;
+	struct node* left;
+	struct node* right;
 } Node;
 
 int initializeBST(Node** h);
@@ -30,7 +31,7 @@ Node* searchIterative(Node* head, int key);  /* search the node for the key */
 int freeBST(Node* head); /* free all memories allocated to the tree */
 
 /* you may add your own defined functions if necessary */
-
+int max_stack = 0;
 
 int main()
 {
@@ -39,7 +40,7 @@ int main()
 	Node* head = NULL;
 	Node* ptr = NULL;	/* temp */
 
-	do{
+	do {
 		printf("\n\n");
 		printf("----------------------------------------------------------------\n");
 		printf("                   Binary Search Tree #1                        \n");
@@ -55,9 +56,10 @@ int main()
 		fflush(stdout);
 		scanf(" %c", &command);
 
-		switch(command) {
+		switch (command) {
 		case 'z': case 'Z':
 			initializeBST(&head);
+			max_stack = 0;
 			break;
 		case 'q': case 'Q':
 			freeBST(head);
@@ -67,6 +69,7 @@ int main()
 			fflush(stdout);
 			scanf("%d", &key);
 			insert(head, key);
+			max_stack++;
 			break;
 		case 'd': case 'D':
 			printf("Your Key = ");
@@ -79,7 +82,7 @@ int main()
 			fflush(stdout);
 			scanf("%d", &key);
 			ptr = searchIterative(head, key);
-			if(ptr != NULL)
+			if (ptr != NULL)
 				printf("\n node [%d] found at %p\n", ptr->key, ptr);
 			else
 				printf("\n Cannot find the node [%d]\n", key);
@@ -89,7 +92,7 @@ int main()
 			fflush(stdout);
 			scanf("%d", &key);
 			ptr = searchRecursive(head->left, key);
-			if(ptr != NULL)
+			if (ptr != NULL)
 				printf("\n node [%d] found at %p\n", ptr->key, ptr);
 			else
 				printf("\n Cannot find the node [%d]\n", key);
@@ -109,7 +112,7 @@ int main()
 			break;
 		}
 
-	}while(command != 'q' && command != 'Q');
+	} while (command != 'q' && command != 'Q');
 
 	return 1;
 }
@@ -117,7 +120,7 @@ int main()
 int initializeBST(Node** h) {
 
 	/* if the tree is not empty, then remove all allocated nodes from the tree*/
-	if(*h != NULL)
+	if (*h != NULL)
 		freeBST(*h);
 
 	/* create a head node */
@@ -132,17 +135,17 @@ int initializeBST(Node** h) {
 
 void inorderTraversal(Node* ptr)
 {
-	if(ptr){
+	if (ptr) {
 		inorderTraversal(ptr->left);
-		printf("%d   ",ptr->key);
+		printf("%d   ", ptr->key);
 		inorderTraversal(ptr->right);
 	}
 }
 
 void preorderTraversal(Node* ptr)
 {
-	if(ptr){
-		printf("%d   ",ptr->key);
+	if (ptr) {
+		printf("%d   ", ptr->key);
 		preorderTraversal(ptr->left);
 		preorderTraversal(ptr->right);
 	}
@@ -150,66 +153,95 @@ void preorderTraversal(Node* ptr)
 
 void postorderTraversal(Node* ptr)
 {
-	if(ptr){
+	if (ptr) {
 		postorderTraversal(ptr->left);
 		postorderTraversal(ptr->right);
-		printf("%d   ",ptr->key);
+		printf("%d   ", ptr->key);
 	}
 }
 
 
 int insert(Node* head, int key)
 {
-	Node* tmp=head->left;
-	Node* node=NULL;
-	Node* tmp_=NULL;
-	node=(Node*)malloc(sizeof(Node));
-	node->key=key;
-	node->left=node->right=NULL;
-	if(!tmp){
-		head->left=node;
+	Node* tmp = head->left;
+	Node* node = NULL;
+	Node* tmp_ = NULL;
+	node = (Node*)malloc(sizeof(Node));
+	node->key = key;
+	node->left = node->right = NULL;
+	if (!tmp) {
+		head->left = node;
 		return 0;
 	}
-	while(tmp){
-		tmp_=tmp;
-	if(key<=tmp->key)
-		tmp=tmp->left;
-	else
-		tmp=tmp->right;
+	while (tmp) {
+		tmp_ = tmp;
+		if (key <= tmp->key)
+			tmp = tmp->left;
+		else
+			tmp = tmp->right;
 	}
-	if(key<=tmp_->key)
-		tmp_->left=node;
+	if (key <= tmp_->key)
+		tmp_->left = node;
 	else
-		tmp_->right=node;
+		tmp_->right = node;
 	return 0;
 }
 
 int deleteLeafNode(Node* head, int key)
 {
-
+	Node* tmp = head->left;
+	Node* tmp_ = head;
+	while (tmp) {
+		if (key == tmp->key)
+			break;
+		else if (key < tmp->key) {
+			tmp_ = tmp;
+			tmp = tmp->left;
+		}
+		else {
+			tmp_ = tmp;
+			tmp = tmp->right;
+		}
+	}
+	if (!tmp) {
+		printf("\n Cannot find the node [%d]\n", key);
+		return 0;
+	}
+	else if (tmp->left != NULL && tmp->right != NULL) {
+		printf("\n%d is not LeafNode\n", key);
+		return 0;
+	}
+	else {
+		if (key <= tmp_->key)
+			tmp_->left = NULL;
+		else
+			tmp_->right = NULL;
+		free(tmp);
+	}
+	return 0;
 }
 
 Node* searchRecursive(Node* ptr, int key)
 {
-	if(!ptr) return NULL;
-	if(ptr->key==key)
+	if (!ptr) return NULL;
+	if (ptr->key == key)
 		return ptr;
-	if(key<ptr->key)
-		return searchRecursive(ptr->left,key);
-	return searchRecursive(ptr->right,key);
+	if (key < ptr->key)
+		return searchRecursive(ptr->left, key);
+	return searchRecursive(ptr->right, key);
 
 }
 
 Node* searchIterative(Node* head, int key)
 {
-	Node* tmp=head->left;
+	Node* tmp = head->left;
 	while (tmp) {
-	if (key == tmp->key)
-		return tmp;
-	else if (key < tmp->key)
-		tmp = tmp->left;
-	else
-		tmp = tmp->right;
+		if (key == tmp->key)
+			return tmp;
+		else if (key < tmp->key)
+			tmp = tmp->left;
+		else
+			tmp = tmp->right;
 	}
 	return NULL;
 }
@@ -217,10 +249,26 @@ Node* searchIterative(Node* head, int key)
 
 int freeBST(Node* head)
 {
+	int rear = 0;
+	int front = -1;
+	Node* node = head->left;
+	Node** queue=(Node**)malloc(sizeof(Node*)*max_stack);
 
+	if (!node)
+		return 0; /* 공백 트리 */
+	queue[rear++] = node;
+	while(1) {
+		node = queue[++front];
+		if (front-1 == max_stack) {
+			if (node->left)
+				queue[rear++] = node->left;
+			if (node->right)
+				queue[rear++] = node->right;
+			free(node);
+		}
+		else
+			break;
+	}
+	free(head);
+	return 0;
 }
-
-
-
-
-
