@@ -35,8 +35,11 @@ int main()
 {
 	char command;
 	int key;
+	int initial=0;//초기화가 진행됐는지 확인한다.
 	Node* head = NULL;//해드노드
 	Node* ptr = NULL;//임시 노드
+
+	printf("[----- [서종원] [2018038031] -----]\n");
 
 	do {
 		printf("\n\n");
@@ -58,60 +61,84 @@ int main()
 		case 'z': case 'Z':
 			initializeBST(&head);
 			max_queue = 0;//초기화를 하면 노드가 0개가 되므로 똑같이 초기화
+			initial++;//초기화가 진행된다면 +1을 해준다.
 			break;
 		case 'q': case 'Q':
-			freeBST(head);
+			if(initial)
+				freeBST(head);
 			break;
 		case 'n': case 'N':
-			printf("Your Key = ");
-			fflush(stdout);
-			scanf("%d", &key);
-			insert(head, key);
-			max_queue++;//노드를 삽입하면 +1
+			if(initial){
+				printf("Your Key = ");
+				fflush(stdout);
+				scanf("%d", &key);
+				insert(head, key);
+				max_queue++;//노드를 삽입하면 +1
+			}
+			else
+				printf("초기화를 먼저 진행해주세요 \n");
 			break;
 		case 'd': case 'D':
-			printf("Your Key = ");
-			fflush(stdout);
-			scanf("%d", &key);
-			deleteLeafNode(head, key);
+			if(initial){
+				printf("Your Key = ");
+				fflush(stdout);
+				scanf("%d", &key);
+				deleteLeafNode(head, key);
+			}
+			else
+				printf("초기화를 먼저 진행해주세요\n");
 			break;
 		case 'f': case 'F':
-			printf("Your Key = ");
-			fflush(stdout);
-			scanf("%d", &key);
-			ptr = searchIterative(head, key);
-			if (ptr != NULL)
-				printf("\n node [%d] found at %p\n", ptr->key, ptr);
+			if(initial){
+				printf("Your Key = ");
+				fflush(stdout);
+				scanf("%d", &key);
+				ptr = searchIterative(head, key);
+				if (ptr != NULL)
+					printf("\n node [%d] found at %p\n", ptr->key, ptr);
+				else
+					printf("\n Cannot find the node [%d]\n", key);
+			}
 			else
-				printf("\n Cannot find the node [%d]\n", key);
+				printf("초기화를 먼저 진행해주세요\n");
 			break;
 		case 's': case 'S':
-			printf("Your Key = ");
-			fflush(stdout);
-			scanf("%d", &key);
-			ptr = searchRecursive(head->left, key);
-			if (ptr != NULL)
-				printf("\n node [%d] found at %p\n", ptr->key, ptr);
+			if(initial){
+				printf("Your Key = ");
+				fflush(stdout);
+				scanf("%d", &key);
+				ptr = searchRecursive(head->left, key);
+				if (ptr != NULL)
+					printf("\n node [%d] found at %p\n", ptr->key, ptr);
+				else
+					printf("\n Cannot find the node [%d]\n", key);
+			}
 			else
-				printf("\n Cannot find the node [%d]\n", key);
+				printf("초기화를 먼저 진행해주세요\n");
 			break;
-
 		case 'i': case 'I':
-			inorderTraversal(head->left);
+			if(initial)
+				inorderTraversal(head->left);
+			else
+				printf("초기화를 먼저 진행해주세요\n");
 			break;
 		case 'p': case 'P':
-			preorderTraversal(head->left);
+			if(initial)
+				preorderTraversal(head->left);
+			else
+				printf("초기화를 먼저 진행해주세요\n");
 			break;
 		case 't': case 'T':
-			postorderTraversal(head->left);
+			if(initial)
+				postorderTraversal(head->left);
+			else
+				printf("초기화를 먼저 진행해주세요\n");
 			break;
 		default:
 			printf("\n       >>>>>   Concentration!!   <<<<<     \n");
 			break;
 		}
-
 	} while (command != 'q' && command != 'Q');
-
 	return 1;
 }
 
@@ -153,7 +180,6 @@ void postorderTraversal(Node* ptr)//후위 순회
 		printf("%d   ", ptr->key);//왼쪽 자식노드와 오른쪽 자식노드 모두 NULL이던가 출력을 완료했다면 해당 노드의 값을 출력한다.
 	}
 }
-
 
 int insert(Node* head, int key)//노드를 삽입한다.
 {
@@ -223,7 +249,6 @@ Node* searchRecursive(Node* ptr, int key)//재귀적으로 키값을 가지는 노드를 찾는�
 	if (key <= ptr->key)//키값이 노드보다 작거나 같다면 해당 노드의 왼쪽 자식노드의 주소로 재귀적으로 함수를 호출한다.
 		return searchRecursive(ptr->left, key);
 	return searchRecursive(ptr->right, key);//크다면 오른쪽 자식노드의 주소로 함수를 호출한다.
-
 }
 
 Node* searchIterative(Node* head, int key)//반복적으로 키값을 가지는 노드를 찾는다.
@@ -264,5 +289,6 @@ int freeBST(Node* head)//트리를 해제한다. 큐를 이용하여 레벨순회방식으로 해제한�
 			break;//반복을 종료한다.
 	}
 	free(head);//해드노드를 해제한다.
+	free(*queue);//큐배열을 해제한다.
 	return 0;//함수를 종료한다.
 }
